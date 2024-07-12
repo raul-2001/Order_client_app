@@ -98,7 +98,7 @@ const Signup =() => {
             ): (
             <section>
                 <p ref={errRef} className={errMsg ? styles.errmsg : styles.offscreen}
-                aria-live="assertive">
+                    aria-live="assertive">
                     {errMsg}
                 </p>
                 <h1>Register</h1>

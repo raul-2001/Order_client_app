@@ -5,14 +5,6 @@ import Select from 'react-select'
 
 const CreateNewOrder = () => {
 
-    // const [formData, setFormData] = useState({
-    //     itemNumber: '',
-    //     itemName: '',
-    //     price: '',
-    //     quantity: '',
-    //     madeIn: '',
-    // })
-    const [formData, setFormData] = useState([])
     const [orderList, setOrderList] = useState({
         "items": [],
         "orderTotal": "",
@@ -23,11 +15,10 @@ const CreateNewOrder = () => {
     const [showElement, setShowElement] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([])
 
-    const handleChange = async (event) => {
+
+    const handleChange = (event) => {
         const value = event.target.value
         setOrderList({...orderList, [event.target.name]: value})
-
-        console.log("orderList  ==>>",orderList)
     }
 
 
@@ -35,6 +26,8 @@ const CreateNewOrder = () => {
     // creates new order
     const postData = async (records) => {
 
+
+        
         if(records.length === 0) {
             return
         }
@@ -50,8 +43,10 @@ const CreateNewOrder = () => {
             body: JSON.stringify(records)
             
         }
+
+        console.log(JSON.stringify(records))
         const url = 'https://zero6-jobs-api-giraffe-3.onrender.com/api/v1/orders'
-        console.log(url)
+        
         try {
 
             const response = await fetch(url, options)
@@ -68,6 +63,9 @@ const CreateNewOrder = () => {
 
             console.log("data =>>", data)
             setOrderList(data.order)
+            // console.log("postData")
+            setShowElement(true)
+            // console.log("postData2")
             return data
     
         } catch (error) {
@@ -80,14 +78,12 @@ const CreateNewOrder = () => {
 
     const handleCreateOrder = useCallback((event) => {
         event.preventDefault()
-
-        const records = orderList;
-
+        
         try {
 
-            postData(records)
-
+            postData(orderList)
             setShowElement(true)
+
         } catch (error) {
             setIsError(error)
             setShowElement(false)
@@ -97,13 +93,14 @@ const CreateNewOrder = () => {
             "items": [""],
             "orderTotal": "",
         })
-    })
+    }, [orderList])
 
 
     // this function uses normal callBack function. Beacause Asynselect is unable use async-await fetching. 
     // it loads data into select-option.
     const loadOptions =  (inputValue, callBack) => {
 
+        console.log("loadOptions")
         const token = localStorage.getItem('token')
         const options = {
             method: "GET",
@@ -128,12 +125,11 @@ const CreateNewOrder = () => {
                         madeIn: item.madeIn
                     }
                 ))
-
+                
                 callBack(formattedItems)
-
+                
             })
 
-    
         } catch (error) {
             setIsError(error)
             console.log(error.message)
@@ -149,11 +145,12 @@ const CreateNewOrder = () => {
         const s = opt.map((item) => {
             arr.push(item.value)
             sum += item.price
+            
         })
-    
+        // console.log("handelSelectChange")
         setSum(sum)
         setSelectedOptions(arr)  
-        orderList.items = arr      
+        orderList.items = arr    
     }
     
 
@@ -165,20 +162,19 @@ const CreateNewOrder = () => {
                     <h1>Success</h1>
                     <h1>Created time: {orderList.createdAt}</h1>
                     <h1>Order number: {orderList.orderNumber}</h1>
+                    <h1>Order total: {orderList.orderTotal}</h1>
                     <h1>Created by: {orderList.createdBy}</h1>
+
                     <p>
                         <Link to='/orders'>GO into Orders</Link>
                     </p>
                 </div>
             ) : (
                 <form onSubmit={handleCreateOrder}>
-                    {/* <label htmlFor='orderNumber'>Order number</label>
-                    <input id="orderNumber" name="orderNumber" type='text' onChange={handleChange} value={orderList.orderNumber}/> */}
-                    {/* <label htmlFor='orderStatus'>Order status</label>
-                    <input id='orderStatus' name="orderStatus" type='text'  onChange={handleChange} value={""}/> */}
+
                     <label htmlFor='orderTotal'>Order sum</label>
                     <input id='orderTotal' name="orderTotal" type='text'  onChange={handleChange} value={orderList.orderTotal = sum}/>
-                    <label htmlFor="item">Select Item:</label>
+                    <label htmlFor="items">Select Item:</label>
                     <AsyncSelect 
                         name='items'
                         isMulti
@@ -186,7 +182,6 @@ const CreateNewOrder = () => {
                         defaultOptions
                         loadOptions={loadOptions}
                         onChange={handleSelectChange}
-
                     />
                     <button type="submit">Create Order</button>
                 </form>

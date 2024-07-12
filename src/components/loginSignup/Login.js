@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom'
 import { useNavigate  } from "react-router-dom";
 
 
-const Login = () => {
+const Login = (props) => {
     const userRef = useRef();
     const errRef = useRef();
     let navigate  = useNavigate ();
@@ -44,7 +44,9 @@ const Login = () => {
 
     }
 
-    
+    const handleLoginChange = () => {
+        
+    }
 
     return(
         <>
@@ -58,7 +60,10 @@ const Login = () => {
                 </section>
             ): (
                 <section>
-                    <p ref={errRef} aria-live='assertive'>{errMsg}</p>
+                    <p ref={errRef} className={errMsg ? styles.errmsg : styles.offscreen} 
+                        aria-live='assertive'>
+                        {errMsg}  
+                    </p>
                     <h1>Sign in</h1>
                     <form onSubmit={handleLogin} className={styles.form}>
                         <div className={styles.row}>
@@ -85,7 +90,7 @@ const Login = () => {
                             />
                         </div>
                         <div className={styles.form_alert}></div>
-                        <button data-testid="submit_button" className={styles.btn} type='submit'>Sign in</button>
+                        <button data-testid="submit_button" onClick={handleLoginChange} className={styles.btn} type='submit'>Sign in</button>
                     </form>
                     <p>
                         <span className={styles.line}>

@@ -1,19 +1,26 @@
 import ItemsList from './ItemsList';
 import React, {useState, useEffect} from 'react'
-import { Link, Route, Router } from 'react-router-dom';
-import CreateNewItem from './NewItem';
-import EditItem from './EditItemList'
+import { Link } from 'react-router-dom';
+
 
 
 const ItemsContainer = () => {
     const [itemList, setItemList] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [isError, setIsError] = useState(false)
+    const [isToken, setIsToken] = useState(false)
 
     const fetchData = async () => {
         setIsLoading(true)
-
+ 
         const token = localStorage.getItem('token')
+
+        if(token) {
+            setIsToken(token)
+        } else {
+            return
+        }
+
         const options = {
             method: "GET",
             headers: {
@@ -21,7 +28,7 @@ const ItemsContainer = () => {
             }
         }
 
-        const url = 'https://order-api-a70z.onrender.com/api/v1/items'
+        const url = 'https://zero6-jobs-api-giraffe-3.onrender.com/api/v1/items'
         
         try {
 
@@ -40,7 +47,7 @@ const ItemsContainer = () => {
                 }
                 return newItems
             })
-            console.log(items)
+            // console.log(items)
             setItemList(items)
     
         } catch (error) {
@@ -52,85 +59,6 @@ const ItemsContainer = () => {
     }
 
 
-
-    const getItem = async (id) => {
-        console.log(id)
-        // return(
-        //     <>
-        //         <Link 
-        //             to={{pathname: '/editItem/param-data',
-        //             state: {stateParam: item}
-        //             }} >
-        //         </Link>
-        //     </>
-        // )
-    }
-
-    const EditItem = async (id) => {
-        const token = localStorage.getItem('token')
-        const options = {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            }
-        }
-        
-
-        const url = `https://order-api-a70z.onrender.com/api/v1/items/${id}`
-
-        try {
-
-            const response = await fetch(url, options)
-
-            if(!response.ok) {
-                const message = `Error: ${response.status}`
-                throw new Error(message)
-            }
-
-            const data = await response.json();
-
-
-        } catch (error) {
-            setIsError(error)
-            console.log(error.message)
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-
-    const updateItem = async (item_id, data) => {
-        
-        const token = localStorage.getItem('token')
-        const options = {
-            method: "PATCH",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-
-        }
-
-        const url = `https://order-api-a70z.onrender.com/api/v1/items/${item_id}`
-
-        try {
-
-            const response = await fetch(url, options)
-
-            if(!response.ok) {
-                const message = `Error: ${response.status}`
-                throw new Error(message)
-            }
-
-            const data = await response.json();
-
-        } catch (error) {
-            setIsError(error)
-            console.log(error.message)
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
     const deleteItem = async (item_id) => {
 
         const token = localStorage.getItem('token')
@@ -141,7 +69,7 @@ const ItemsContainer = () => {
             }
         }
 
-        const url = `https://order-api-a70z.onrender.com/api/v1/items/${item_id}`
+        const url = `https://zero6-jobs-api-giraffe-3.onrender.com/api/v1/items/${item_id}`
 
         try {
 
@@ -183,32 +111,38 @@ const ItemsContainer = () => {
 
     }
 
-    const createNewItem = async (e) => {
-        e.preventDefault();
-    }
-
     useEffect(() => {
         fetchData()
-    }, [])
+    }, [isToken])
 
     return(
         <>
-            <button>
-                <Link to="/newItem">Create new item</Link>
-            </button>
-            {isError && <p>Something went wrong ...</p>}
-                {isLoading ? <div>Loading ...</div> :
-                (
-                    <ItemsList 
-                        itemList={itemList} 
-                        onGetItems={getItem}
+        
+            {
+                isToken ? (
+                    <div>
+                        <button><Link to="/newItem">Create new item</Link></button>
+                        
+                        {isError && <p>Something went wrong ...</p>}
+                            {isLoading ? <div>Loading ...</div> :
+                            (
+                                <ItemsList 
+                                    itemList={itemList} 
+                                    onRemoveItems={removeItem}
+                                />
+                            )
+                            }
+                    </div>
+                    
+                    
+                ) : (
+                    <div>
+                    <h1>Items</h1>
+                        You must be authorized
+                    </div>
+                ) 
+            }
 
-                        onEditItems={EditItem}
-                        onUpdateItems={updateItem}
-                        onRemoveItems={removeItem}
-                    />
-                )
-                }
         </>
     )
 }

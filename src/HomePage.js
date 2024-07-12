@@ -3,7 +3,11 @@ import styles from './components/loginSignup/LSignup.module.css'
 const LandingPage = () => {
     return(
         <>
-            <h1>Home page</h1>
+            
+            <div className={styles.hederContainer}>
+                <h1>Order app</h1>
+                <p>Create your orders and items</p>
+            </div>
         </>
     )
 }

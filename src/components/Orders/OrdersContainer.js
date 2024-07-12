@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { Link, Route, Router } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import OrdersList from './OrdersList';
 
 const OrderContainer = () => {
@@ -7,11 +7,19 @@ const OrderContainer = () => {
     const [orderList, setOrderList] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [isError, setIsError] = useState(false)
+    const [isToken, setIsToken] = useState(false)
 
+    /// fetches all orders
     const fetchData = async () => {
         setIsLoading(true)
 
         const token = localStorage.getItem('token')
+        if(token) {
+            setIsToken(token)
+        } else {
+            return
+        }
+
         const options = {
             method: "GET",
             headers: {
@@ -19,7 +27,7 @@ const OrderContainer = () => {
             }
         }
 
-        const url = 'https://order-api-a70z.onrender.com/api/v1/orders'
+        const url = 'https://zero6-jobs-api-giraffe-3.onrender.com/api/v1/orders'
         
         try {
 
@@ -40,24 +48,17 @@ const OrderContainer = () => {
             })
 
             
-        setOrderList(orders)
+            setOrderList(orders)
     
         } catch (error) {
             setIsError(error)
+
             console.log(error.message)
         } finally {
             setIsLoading(false)
         }
     }
 
-    const getOrder = () => {
-
-    }
-
-
-    const updateOrder = () => {
-
-    }
 
     const deleteOrder = async (order_id) => {
         const token = localStorage.getItem('token')
@@ -69,7 +70,7 @@ const OrderContainer = () => {
         }
 
         
-        const url = `https://order-api-a70z.onrender.com/api/v1/orders/${order_id}`
+        const url = `https://zero6-jobs-api-giraffe-3.onrender.com/api/v1/orders/${order_id}`
         
 
         try {
@@ -92,7 +93,7 @@ const OrderContainer = () => {
     
         } catch (error) {
             setIsError(error)
-            // console.log(error.message)
+            console.log(error.message)
             return null;
         } finally {
             setIsLoading(false)
@@ -117,26 +118,68 @@ const OrderContainer = () => {
         setOrderList(updatedList)
     }
 
+
     useEffect(() => {
         fetchData()
-    }, [])
+
+        
+    }, [isToken])
+
+
+
+
+    
+
 
     return(
         <>
-            <button>
-                <Link to="/newOrder">Create new order</Link>
-            </button>
-            {isError && <p>Something went wrong ...</p>}
-                {isLoading ? <div>Loading ...</div> :
-                (
-                    <OrdersList 
-                        orderList={orderList}
-                        onGetOrder={getOrder}
-                        onUpdateOrder={updateOrder}
-                        onRemoveOrder={removeOrder}
-                    />
-                )
-                }
+            {
+                isToken ? (
+                    <div>
+                        <button><Link to="/newOrder">Create new order</Link></button>
+
+                        {isError ? (<p>Something went wrong ...</p>) :
+                        (
+                            <div>
+                                {isLoading ? <div>Loading ...</div> :
+                                (
+                                    <OrdersList 
+                                        orderList={orderList}
+                                        onRemoveOrder={removeOrder}
+                                       
+                                    />
+                                )
+                                }
+                            </div>
+                        ) 
+            }
+                    </div>
+
+                    
+                ) : (
+                    <div>
+                    <h1>Order list</h1>
+                        You must be authorized
+
+                    </div>
+                ) 
+            }
+            {/* {isError && <p>Something went wrong ...</p>} */}
+            {/* {isError ? (<p>Something went wrong ...</p>) :
+            (
+                <div>
+                    {isLoading ? <div>Loading ...</div> :
+                    (
+                        <OrdersList 
+                            orderList={orderList}
+                            onRemoveOrder={removeOrder}
+                        />
+                    )
+                    }
+                </div>
+            ) 
+            } */}
+
 
         </>
     )

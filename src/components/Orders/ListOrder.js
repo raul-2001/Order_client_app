@@ -1,31 +1,35 @@
 import { Link } from 'react-router-dom'
-const ListOrder = ({order, onGetOrder, onUpdateOrder, onRemoveOrder}) => {
+import EditOrder from './EditOrder'
+import { useEffect } from 'react'
 
-    const handleEditClick = (order) => {  
-        onGetOrder(order)
-    }
 
+
+const ListOrder = ({order, onRemoveOrder}) => {
+
+    const {_id, orderNumber, orderStatus, items} = order.order
+    
     const handleRemoveClick = () => {
-        onRemoveOrder(order.order._id)
+        onRemoveOrder(_id)
     }
 
 
     return(
         <>
             <li
-                key={order.order._id} 
+                key={_id} 
             >
-                <span>{order.order.orderNumber}</span>
+                <span>{orderNumber}--</span>
                 <br />
-                <span>{order.order._id}</span>
+                <span>{_id}--</span>
                 <br />
-                <span>{order.order.orderStatus}</span>
+                <span>{orderStatus}--</span>
                 <br />
+                
+                {/* <span>{items}--</span> */}
                 <button
                     type='button'
-                    onClick={() => handleEditClick(order)}
                 >
-                    <Link key={order.order._id} to="#">
+                    <Link key={_id}  to={{pathname: `/editOrder/${_id}`}}>
                         Edit
                     </Link>
                     
